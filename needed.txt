@@ -1,0 +1,45 @@
+Case:
+Login service acting as a bridge connecting login page and keycloak api
+acceptance criteria:
+1. Credentials sent to keycloak api
+2. If credentials is wrong, return 400 bad request, return username/password is invalid
+3. If credentials is right sent accessToken, refreshToken dan idToken as response
+  
+
+Solution design:
+1. Create api service that recieve login request
+2. Use POST request to sent credentials along with client id, client issuer and payload needed to sent to keycloak
+3. If credentials is wrong sent response as 400 bad request with message username/password is invalid
+4. Store accessToken, refreshToken dan idToken to response cookies and sent it as http response along with user's role
+
+Pseudocode:
+
+Models:
+class User {
+  username string
+  password string
+}
+
+class LoggedInUser {
+  accessToken string
+  refreshToken string
+  idToken string
+}
+
+Services:
+
+type Auth struct {
+}
+
+interface AuthUser {
+  auth(u: User) LoggedInUser
+}
+
+class Auth (LoggedInUser, error)  {
+  return a;
+}
+
+Applications:
+class Auth () {
+  auth
+}
