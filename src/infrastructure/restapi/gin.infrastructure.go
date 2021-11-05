@@ -10,7 +10,7 @@ import (
 )
 
 type RestAPIInfra struct {
-	UserApplication applications.ApplicationsInterface
+	AuthApplication applications.AuthApplicationsInterface
 }
 
 type RestAPIInfraInterface interface {
@@ -19,15 +19,18 @@ type RestAPIInfraInterface interface {
 
 func (u *RestAPIInfra) Login(c *gin.Context) {
 	var password, username *string
-	*password = c.Query("password")
-	*username = c.Query("username")
+	usn := c.PostForm("username")
+	pass := c.PostForm("password")
 
-	User := &models.User{
+	username = &usn
+	password = &pass
+
+	Auth := &models.Credential{
 		Username: username,
 		Password: password,
 	}
 
-	LoggedIn, err := u.UserApplication.Login(User)
+	LoggedIn, err := u.AuthApplication.Login(Auth)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, map[string]interface{}{
 			"error": err,
@@ -36,7 +39,7 @@ func (u *RestAPIInfra) Login(c *gin.Context) {
 	}
 
 	maxAge := int(24 * time.Hour)
-	domain := "localhost:3000"
+	domain := "localhost"
 
 	c.SetCookie(
 		"access_token",
