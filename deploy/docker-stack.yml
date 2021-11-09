@@ -1,0 +1,39 @@
+version: "3.7"
+
+services:
+  pefindo-service:
+    image: "gcr.io/papitupi/pefindo-service:${VERSION}"
+    deploy:
+      mode: replicated
+      replicas: 1
+      endpoint_mode: vip
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: any
+        max_attempts: 3
+        window: 120s
+    env_file:
+      - "./${STAGE}.env"
+    secrets:
+      - source: "secret"
+        target: ".env"
+    sysctls:
+      net.core.somaxconn: 4096
+    networks:
+      - cluster
+      - bridge
+
+secrets:
+  "secret":
+    name: "pefindo-service-secrets"
+    external: true
+
+networks:
+  cluster:
+    name: cluster
+    external: true
+  bridge:
+    name: bridge
+    external: true
